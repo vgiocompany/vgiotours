@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VGIO TOURS - Explora, Sueña, Descubre</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* gris claro de fondo */
+        }
+        .hero-bg {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f43f5e; /* rosa */
+            transition: width 0.3s;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .package-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer; /* Añadido para indicar que es clickeable */
+        }
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        .modal-backdrop {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-content {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50 transition-all duration-300">
+        <nav class="container mx-auto px-4 lg:px-6 py-3 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-2">
+                 <img src="https://i.postimg.cc/gJDL5ZGx/export202510081223452030-copia-Photoroom.png" class="h-10">
+                <span class="text-2xl font-extrabold text-gray-800" data-translate="vgio_tours">VGIO TOURS</span>
+            </a>
+            
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <div class="relative hidden sm:block">
+                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"></i>
+                     <input type="text" id="search-input" data-translate-placeholder="search_placeholder" placeholder="Buscar destino..." class="w-32 md:w-48 pl-10 pr-4 py-2 border rounded-full bg-gray-50 focus:outline-none focus:ring-2 focus:ring-rose-300 transition-all duration-300 focus:w-40 md:focus:w-56">
+                </div>
+
+                <div class="relative">
+                    <button id="lang-switcher-btn" class="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors">
+                        <i data-lucide="globe" class="w-5 h-5 text-gray-600"></i>
+                        <span id="current-lang-display" class="font-semibold text-sm">ES | PEN</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-600"></i>
+                    </button>
+                    <div id="lang-switcher-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl overflow-hidden hidden z-50">
+                        <a href="#" class="lang-option block px-4 py-2 text-sm text-gray-700 hover:bg-rose-500 hover:text-white" data-lang="es" data-currency="PEN">Español (PEN)</a>
+                        <a href="#" class="lang-option block px-4 py-2 text-sm text-gray-700 hover:bg-rose-500 hover:text-white" data-lang="en" data-currency="USD">English (USD)</a>
+                        <a href="#" class="lang-option block px-4 py-2 text-sm text-gray-700 hover:bg-rose-500 hover:text-white" data-lang="fr" data-currency="EUR">Français (EUR)</a>
+                        <a href="#" class="lang-option block px-4 py-2 text-sm text-gray-700 hover:bg-rose-500 hover:text-white" data-lang="ja" data-currency="JPY">日本語 (JPY)</a>
+                        <a href="#" class="lang-option block px-4 py-2 text-sm text-gray-700 hover:bg-rose-500 hover:text-white" data-lang="zh" data-currency="CNY">中文 (CNY)</a>
+                    </div>
+                </div>
+
+                <button id="cart-btn" class="relative p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <i data-lucide="shopping-cart" class="w-6 h-6 text-gray-700"></i>
+                    <span id="cart-counter" class="absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                </button>
+                
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-bg text-white h-[60vh] flex items-center justify-center">
+            <div class="text-center bg-black bg-opacity-40 p-10 rounded-xl">
+                <h1 class="text-4xl md:text-6xl font-extrabold mb-4 drop-shadow-lg" data-translate="hero_title">Tu Próxima Aventura Comienza Aquí</h1>
+                <p class="text-lg md:text-xl max-w-2xl mx-auto" data-translate="hero_subtitle">Explora los destinos más increíbles del mundo con paquetes diseñados para ti.</p>
+            </div>
+        </section>
+
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-4 lg:px-6">
+                <h2 class="text-3xl font-bold text-center mb-2" data-translate="packages_title">Descubre tu Próximo Viaje</h2>
+                <p class="text-center text-gray-500 mb-12" data-translate="packages_subtitle">Ofertas imperdibles para destinos soñados.</p>
+                
+                <div id="packages-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4 lg:px-6">
+                <h2 class="text-3xl font-bold text-center mb-2" data-translate="social_title">Nuestras Aventuras en Redes</h2>
+                <p class="text-center text-gray-500 mb-12" data-translate="social_subtitle">Síguenos y vive la experiencia VGIO TOURS día a día.</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="group relative overflow-hidden rounded-lg">
+                        <img src="https://images.unsplash.com/photo-1539635278303-d4002c07eae3?q=80&w=2070&auto=format&fit=crop" alt="Post de red social" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                             <i data-lucide="instagram" class="w-10 h-10 text-white"></i>
+                        </div>
+                    </div>
+                     <div class="group relative overflow-hidden rounded-lg">
+                        <img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=1966&auto=format&fit=crop" alt="Post de red social" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                             <i data-lucide="instagram" class="w-10 h-10 text-white"></i>
+                        </div>
+                    </div>
+                     <div class="group relative overflow-hidden rounded-lg">
+                        <img src="https://images.unsplash.com/photo-1528543606781-df6e6757b107?q=80&w=2070&auto=format&fit=crop" alt="Post de red social" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                             <i data-lucide="instagram" class="w-10 h-10 text-white"></i>
+                        </div>
+                    </div>
+                     <div class="group relative overflow-hidden rounded-lg">
+                        <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=2070&auto=format&fit=crop" alt="Post de red social" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                             <i data-lucide="instagram" class="w-10 h-10 text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4 lg:px-6 text-center">
+            <p>&copy; 2025 VGIO TOURS. <span data-translate="rights_reserved">Todos los derechos reservados.</span></p>
+        </div>
+    </footer>
+
+    <div id="cart-modal" class="fixed inset-0 z-[100] flex items-center justify-center hidden">
+        <div id="modal-backdrop" class="absolute inset-0 bg-black bg-opacity-50 modal-backdrop opacity-0"></div>
+        
+        <div id="modal-content" class="bg-white rounded-lg shadow-2xl w-11/12 md:max-w-2xl mx-auto z-10 transform scale-95 opacity-0 modal-content">
+            <div class="flex justify-between items-center p-5 border-b">
+                <h3 class="text-2xl font-bold" data-translate="cart_title">Carrito de Compras</h3>
+                <button id="close-modal-btn" class="p-2 rounded-full hover:bg-gray-200">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <div id="cart-items-container" class="p-6 max-h-[60vh] overflow-y-auto">
+                <p id="empty-cart-msg" class="text-gray-500 text-center" data-translate="empty_cart">Tu carrito está vacío.</p>
+            </div>
+            
+            <div class="p-5 border-t">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-semibold" data-translate="total">Total:</span>
+                    <span id="cart-total" class="text-2xl font-bold text-rose-500">PEN 0.00</span>
+                </div>
+                <button class="w-full bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-400" id="checkout-btn" data-translate="checkout" disabled>
+                    Proceder al Pago
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="package-detail-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
+        <div id="detail-modal-backdrop" class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm modal-backdrop opacity-0"></div>
+        
+        <div id="detail-modal-content" class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto z-10 transform scale-95 opacity-0 modal-content overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
+            <div class="w-full md:w-1/2 h-64 md:h-auto">
+                <img id="detail-img" src="" alt="Imagen del paquete" class="w-full h-full object-cover">
+            </div>
+            
+            <div class="w-full md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 id="detail-name" class="text-3xl font-extrabold text-gray-800"></h3>
+                    <button id="close-detail-modal-btn" class="p-2 -mr-2 -mt-2 rounded-full hover:bg-gray-200">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                
+                <p id="detail-desc" class="text-gray-600 mb-6"></p>
+                
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <h4 class="font-bold text-gray-700 flex items-center space-x-2 mb-2">
+                            <i data-lucide="clock" class="w-5 h-5 text-rose-500"></i>
+                            <span data-translate="duration">Duración</span>
+                        </h4>
+                        <p id="detail-duration" class="pl-7 text-gray-600"></p>
+                    </div>
+                     <div>
+                        <h4 class="font-bold text-gray-700 flex items-center space-x-2 mb-2">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-rose-500"></i>
+                            <span data-translate="includes">Incluye</span>
+                        </h4>
+                        <ul id="detail-includes" class="list-disc list-inside pl-7 text-gray-600 space-y-1"></ul>
+                    </div>
+                </div>
+
+                <div class="mt-auto pt-6 border-t">
+                     <p class="text-gray-500 text-sm" data-translate="price_from">Desde</p>
+                     <p id="detail-price" class="text-4xl font-extrabold text-gray-800 mb-4"></p>
+                     <button id="detail-add-to-cart-btn" class="w-full font-bold py-3 px-4 rounded-lg transition-colors duration-300">
+                         </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- ESTADO DE LA APLICACIÓN ---
+            let currentLang = 'es';
+            let currentCurrency = 'PEN';
+            const cart = [];
+
+            // --- DATOS ---
+            const translations = {
+                es: {
+                    vgio_tours: "VGIO TOURS", hero_title: "Tu Próxima Aventura Comienza Aquí", hero_subtitle: "Explora los destinos más increíbles del mundo con paquetes diseñados para ti.", packages_title: "Descubre tu Próximo Viaje", packages_subtitle: "Ofertas imperdibles para destinos soñados.", social_title: "Nuestras Aventuras en Redes", social_subtitle: "Síguenos y vive la experiencia VGIO TOURS día a día.", rights_reserved: "Todos los derechos reservados.", cart_title: "Carrito de Compras", empty_cart: "Tu carrito está vacío.", total: "Total:", checkout: "Proceder al Pago", price_from: "Desde", add_to_cart: "Agregar al Carrito", added_to_cart: "Agregado", search_placeholder: "Buscar destino...", no_results: "No se encontraron paquetes que coincidan con tu búsqueda.", duration: "Duración", includes: "Incluye",
+                    pkg_ruta_del_sol_name: 'Ruta del Sol', pkg_ruta_del_sol_desc: 'Un viaje inolvidable por la costa norte del Perú, explorando las antiguas culturas Moche y Chimú. Visita la Huaca del Sol y de la Luna, Chan Chan y el balneario de Huanchaco.', pkg_ruta_del_sol_duration: '2 Días / 1 Noche', pkg_ruta_del_sol_includes: ['Transporte turístico', 'Guía oficial', 'Tickets de ingreso', 'Alojamiento básico'],
+                    pkg_otuzco_name: 'Otuzco', pkg_otuzco_desc: 'Conocida como la "Capital de la Fe", Otuzco te espera con su imponente santuario y sus paisajes andinos. Una experiencia de devoción y cultura.', pkg_otuzco_duration: 'Full Day', pkg_otuzco_includes: ['Transporte', 'Guía', 'Snack a bordo'],
+                    pkg_sipan_name: 'Sipán Day', pkg_sipan_desc: 'Descubre los tesoros del Señor de Sipán en un tour de día completo. Visita el museo Tumbas Reales y el complejo arqueológico de Huaca Rajada.', pkg_sipan_duration: 'Full Day', pkg_sipan_includes: ['Transporte desde Chiclayo', 'Guía experto', 'Entradas a museos'],
+                    pkg_cascas_extreme_name: 'Cascas - Extreme Day', pkg_cascas_extreme_desc: 'Aventura y adrenalina en la capital de la uva y el vino. Disfruta de canopy, un puente colgante y la deliciosa gastronomía local.', pkg_cascas_extreme_duration: 'Full Day', pkg_cascas_extreme_includes: ['Transporte', 'Deportes de aventura', 'Degustación de vinos'],
+                    pkg_cascas_especial_name: 'Cascas - Especial Days', pkg_cascas_especial_desc: 'Una versión extendida del tour a Cascas, con más tiempo para disfrutar de las bodegas de vino, piscinas y la belleza del valle.', pkg_cascas_especial_duration: 'Full Day', pkg_cascas_especial_includes: ['Transporte', 'Guía', 'Almuerzo típico', 'Visita a viñedos'],
+                    pkg_canoncillo_name: 'Cañoncillo - Full Day', pkg_canoncillo_desc: 'Explora el bosque seco de Cañoncillo, un oasis en medio del desierto. Ideal para caminatas, sandboard y conectarse con la naturaleza.', pkg_canoncillo_duration: 'Full Day', pkg_canoncillo_includes: ['Transporte 4x4', 'Guía', 'Tabla de sandboard'],
+                    pkg_cordonada_name: 'Poroto', pkg_cordonada_desc: 'Descubre la impresionante catarata Cordonada, una joya escondida en la sierra de La Libertad. Una caminata que vale la pena el esfuerzo.', pkg_cordonada_duration: 'Full Day', pkg_cordonada_includes: ['Transporte', 'Guía de trekking', 'Box lunch'],
+                    pkg_tokyo_name: 'Aventura en Tokio', pkg_tokyo_desc: 'Sumérgete en la vibrante cultura de Tokio. Desde los templos antiguos hasta los rascacielos de neón, esta ciudad te sorprenderá en cada esquina.', pkg_tokyo_duration: '7 Días / 6 Noches', pkg_tokyo_includes: ['Vuelos internacionales', 'Alojamiento 4 estrellas', 'Algunos tours guiados', 'Japan Rail Pass']
+                },
+                en: {
+                    vgio_tours: "VGIO TOURS", hero_title: "Your Next Adventure Starts Here", hero_subtitle: "Explore the most incredible destinations in the world with packages designed for you.", packages_title: "Discover Your Next Trip", packages_subtitle: "Unmissable offers for dream destinations.", social_title: "Our Adventures on Social Media", social_subtitle: "Follow us and live the VGIO TOURS experience day by day.", rights_reserved: "All rights reserved.", cart_title: "Shopping Cart", empty_cart: "Your cart is empty.", total: "Total:", checkout: "Proceed to Checkout", price_from: "From", add_to_cart: "Add to Cart", added_to_cart: "Added", search_placeholder: "Search destination...", no_results: "No packages found matching your search.", duration: "Duration", includes: "Includes",
+                    pkg_ruta_del_sol_name: 'Route of the Sun', pkg_ruta_del_sol_desc: 'An unforgettable journey along the northern coast of Peru, exploring the ancient Moche and Chimú cultures. Visit the Huaca del Sol y de la Luna, Chan Chan, and the seaside town of Huanchaco.', pkg_ruta_del_sol_duration: '2 Days / 1 Night', pkg_ruta_del_sol_includes: ['Tourist transportation', 'Official guide', 'Entrance tickets', 'Basic accommodation'],
+                    pkg_otuzco_name: 'Otuzco', pkg_otuzco_desc: 'Known as the "Capital of Faith," Otuzco awaits you with its imposing sanctuary and Andean landscapes. An experience of devotion and culture.', pkg_otuzco_duration: 'Full Day', pkg_otuzco_includes: ['Transportation', 'Guide', 'Snack on board'],
+                    pkg_sipan_name: 'Sipán Day', pkg_sipan_desc: 'Discover the treasures of the Lord of Sipán on a full-day tour. Visit the Royal Tombs Museum and the Huaca Rajada archaeological complex.', pkg_sipan_duration: 'Full Day', pkg_sipan_includes: ['Transportation from Chiclayo', 'Expert guide', 'Museum tickets'],
+                    pkg_cascas_extreme_name: 'Cascas - Extreme Day', pkg_cascas_extreme_desc: 'Adventure and adrenaline in the capital of grapes and wine. Enjoy canopy, a suspension bridge, and delicious local cuisine.', pkg_cascas_extreme_duration: 'Full Day', pkg_cascas_extreme_includes: ['Transportation', 'Adventure sports', 'Wine tasting'],
+                    pkg_cascas_especial_name: 'Cascas - Special Days', pkg_cascas_especial_desc: 'An extended version of the tour to Cascas, with more time to enjoy the wineries, pools, and the beauty of the valley.', pkg_cascas_especial_duration: 'Full Day', pkg_cascas_especial_includes: ['Transportation', 'Guide', 'Typical lunch', 'Visit to vineyards'],
+                    pkg_canoncillo_name: 'Cañoncillo - Full Day', pkg_canoncillo_desc: 'Explore the dry forest of Cañoncillo, an oasis in the middle of the desert. Ideal for hiking, sandboarding, and connecting with nature.', pkg_canoncillo_duration: 'Full Day', pkg_canoncillo_includes: ['4x4 Transportation', 'Guide', 'Sandboard'],
+                    pkg_cordonada_name: 'Cordonada - Full Day', pkg_cordonada_desc: 'Discover the impressive Cordonada waterfall, a hidden gem in the highlands of La Libertad. A hike that is worth the effort.', pkg_cordonada_duration: 'Full Day', pkg_cordonada_includes: ['Transportation', 'Trekking guide', 'Box lunch'],
+                    pkg_tokyo_name: 'Tokyo Adventure', pkg_tokyo_desc: 'Immerse yourself in the vibrant culture of Tokyo. From ancient temples to neon skyscrapers, this city will surprise you at every turn.', pkg_tokyo_duration: '7 Days / 6 Nights', pkg_tokyo_includes: ['International flights', '4-star accommodation', 'Some guided tours', 'Japan Rail Pass']
+                },
+                fr: {
+                    vgio_tours: "VGIO TOURS", hero_title: "Votre Prochaine Aventure Commence Ici", hero_subtitle: "Explorez les destinations les plus incroyables du monde avec des forfaits conçus pour vous.", packages_title: "Découvrez Votre Prochain Voyage", packages_subtitle: "Offres immanquables pour des destinations de rêve.", social_title: "Nos Aventures sur les Réseaux", social_subtitle: "Suivez-nous et vivez l'expérience VGIO TOURS au quotidien.", rights_reserved: "Tous droits réservés.", cart_title: "Panier d'achat", empty_cart: "Votre panier est vide.", total: "Total:", checkout: "Passer à la caisse", price_from: "À partir de", add_to_cart: "Ajouter au Panier", added_to_cart: "Ajouté", search_placeholder: "Rechercher une destination...", no_results: "Aucun forfait ne correspond à votre recherche.", duration: "Durée", includes: "Inclus",
+                    pkg_ruta_del_sol_name: 'Route du Soleil', pkg_ruta_del_sol_desc: 'Un voyage inoubliable sur la côte nord du Pérou, à la découverte des anciennes cultures Moche et Chimú. Visitez la Huaca del Sol y de la Luna, Chan Chan et la station balnéaire de Huanchaco.', pkg_ruta_del_sol_duration: '2 Jours / 1 Nuit', pkg_ruta_del_sol_includes: ['Transport touristique', 'Guide officiel', 'Billets d\'entrée', 'Hébergement de base'],
+                    pkg_otuzco_name: 'Otuzco', pkg_otuzco_desc: 'Connue comme la "Capitale de la Foi", Otuzco vous attend avec son imposant sanctuaire et ses paysages andins. Une expérience de dévotion et de culture.', pkg_otuzco_duration: 'Journée complète', pkg_otuzco_includes: ['Transport', 'Guide', 'Collation à bord'],
+                    pkg_sipan_name: 'Journée Sipán', pkg_sipan_desc: 'Découvrez les trésors du Seigneur de Sipán lors d\'une excursion d\'une journée. Visitez le musée des Tombes Royales et le complexe archéologique de Huaca Rajada.', pkg_sipan_duration: 'Journée complète', pkg_sipan_includes: ['Transport depuis Chiclayo', 'Guide expert', 'Billets de musée'],
+                    pkg_cascas_extreme_name: 'Cascas - Journée Extrême', pkg_cascas_extreme_desc: 'Aventure et adrénaline dans la capitale du raisin et du vin. Profitez de la tyrolienne, d\'un pont suspendu et de la délicieuse gastronomie locale.', pkg_cascas_extreme_duration: 'Journée complète', pkg_cascas_extreme_includes: ['Transport', 'Sports d\'aventure', 'Dégustation de vin'],
+                    pkg_cascas_especial_name: 'Cascas - Jours Spéciaux', pkg_cascas_especial_desc: 'Une version étendue de l\'excursion à Cascas, avec plus de temps pour profiter des caves, des piscines et de la beauté de la vallée.', pkg_cascas_especial_duration: 'Journée complète', pkg_cascas_especial_includes: ['Transport', 'Guide', 'Déjeuner typique', 'Visite de vignobles'],
+                    pkg_canoncillo_name: 'Cañoncillo - Journée Complète', pkg_canoncillo_desc: 'Explorez la forêt sèche de Cañoncillo, une oasis au milieu du désert. Idéal pour la randonnée, le sandboard et la connexion avec la nature.', pkg_canoncillo_duration: 'Journée complète', pkg_canoncillo_includes: ['Transport 4x4', 'Guide', 'Planche de sandboard'],
+                    pkg_cordonada_name: 'Cordonada - Journée Complète', pkg_cordonada_desc: 'Découvrez l\'impressionnante cascade de Cordonada, un joyau caché dans les montagnes de La Libertad. Une randonnée qui en vaut la peine.', pkg_cordonada_duration: 'Journée complète', pkg_cordonada_includes: ['Transport', 'Guide de trekking', 'Panier-repas'],
+                    pkg_tokyo_name: 'Aventure à Tokyo', pkg_tokyo_desc: 'Plongez dans la culture vibrante de Tokyo. Des temples anciens aux gratte-ciel de néon, cette ville vous surprendra à chaque coin de rue.', pkg_tokyo_duration: '7 Jours / 6 Nuits', pkg_tokyo_includes: ['Vols internationaux', 'Hébergement 4 étoiles', 'Quelques visites guidées', 'Japan Rail Pass']
+                },
+                ja: {
+                    vgio_tours: "VGIOツアー", hero_title: "次の冒険はここから始まる", hero_subtitle: "あなたのためにデザインされたパッケージで、世界で最も素晴らしい目的地を探検してください。", packages_title: "次の旅行を発見する", packages_subtitle: "夢の目的地へのお見逃しなく。", social_title: "ソーシャルメディアでの冒険", social_subtitle: "フォローして、VGIO TOURS体験を毎日お楽しみください。", rights_reserved: "全著作権所有。", cart_title: "ショッピングカート", empty_cart: "カートは空です。", total: "合計:", checkout: "支払いに進む", price_from: "から", add_to_cart: "カートに追加", added_to_cart: "追加済み", search_placeholder: "目的地を検索...", no_results: "検索に一致するパッケージは見つかりませんでした。", duration: "期間", includes: "含まれるもの",
+                    pkg_ruta_del_sol_name: '太陽の道', pkg_ruta_del_sol_desc: 'ペルーの北海岸を巡る忘れられない旅。古代モチェ文化とチムー文化を探訪します。太陽のワカと月のワカ、チャン・チャン、ワンチャコのリゾートを訪れます。', pkg_ruta_del_sol_duration: '2日間/1泊', pkg_ruta_del_sol_includes: ['観光交通', '公認ガイド', '入場券', '基本宿泊施設'],
+                    pkg_otuzco_name: 'オトゥスコ', pkg_otuzco_desc: '「信仰の都」として知られるオトゥスコは、壮大な聖域とアンデスの風景であなたを待っています。信仰と文化の体験。', pkg_otuzco_duration: '終日', pkg_otuzco_includes: ['交通', 'ガイド', '車内スナック'],
+                    pkg_sipan_name: 'シパン・デー', pkg_sipan_desc: '一日ツアーでシパン王の秘宝を発見してください。王家の墓博物館とワカ・ラハダ遺跡群を訪れます。', pkg_sipan_duration: '終日', pkg_sipan_includes: ['チクラヨからの交通', '専門ガイド', '博物館の入場券'],
+                    pkg_cascas_extreme_name: 'カスカス - エクストリーム・デー', pkg_cascas_extreme_desc: 'ブドウとワインの都で冒険とアドレナリンを。キャノピー、吊り橋、そして美味しい地元料理をお楽しみください。', pkg_cascas_extreme_duration: '終日', pkg_cascas_extreme_includes: ['交通', 'アドベンチャースポーツ', 'ワインテイスティング'],
+                    pkg_cascas_especial_name: 'カスカス - スペシャル・デイズ', pkg_cascas_especial_desc: 'カスカスへのツアーの延長版。ワイナリー、プール、そして谷の美しさをより長く楽しむことができます。', pkg_cascas_especial_duration: '終日', pkg_cascas_especial_includes: ['交通', 'ガイド', '郷土料理の昼食', 'ブドウ園訪問'],
+                    pkg_canoncillo_name: 'カニョンシージョ - 終日', pkg_canoncillo_desc: '砂漠の中のオアシス、カニョンシージョの乾燥林を散策します。ハイキング、サンドボード、自然との触れ合いに最適です。', pkg_canoncillo_duration: '終日', pkg_canoncillo_includes: ['4x4交通', 'ガイド', 'サンドボード'],
+                    pkg_cordonada_name: 'コルドナダ - 終日', pkg_cordonada_desc: 'ラ・リベルタードの山岳地帯に隠された宝石、印象的なコルドナダの滝を発見してください。努力する価値のあるハイキングです。', pkg_cordonada_duration: '終日', pkg_cordonada_includes: ['交通', 'トレッキングガイド', 'お弁当'],
+                    pkg_tokyo_name: '東京アドベンチャー', pkg_tokyo_desc: '東京の活気ある文化に浸ってください。古代の寺院からネオンの超高層ビルまで、この街はあらゆる角であなたを驚かせます。', pkg_tokyo_duration: '7日間/6泊', pkg_tokyo_includes: ['国際線', '4つ星ホテル', '一部ガイド付きツアー', 'ジャパンレールパス']
+                },
+                zh: {
+                    vgio_tours: "VGIO旅游", hero_title: "您的下一次冒险从这里开始", hero_subtitle: "通过为您设计的套餐，探索世界上最令人难以置信的目的地。", packages_title: "发现您的下一次旅行", packages_subtitle: "梦想目的地的不可错过的优惠。", social_title: "我们在社交媒体上的冒险", social_subtitle: "关注我们，每天体验VGIO TOURS。", rights_reserved: "版权所有。", cart_title: "购物车", empty_cart: "您的购物车是空的。", total: "总计:", checkout: "进行结算", price_from: "从", add_to_cart: "添加到购物车", added_to_cart: "已添加", search_placeholder: "搜索目的地...", no_results: "未找到符合您搜索条件的套餐。", duration: "期间", includes: "包括",
+                    pkg_ruta_del_sol_name: '太阳之路', pkg_ruta_del_sol_desc: '沿着秘鲁北部海岸进行一次难忘的旅行，探索古老的莫切和奇穆文化。参观太阳神庙和月亮神庙、昌昌古城和万查科海滨度假区。', pkg_ruta_del_sol_duration: '2天/1夜', pkg_ruta_del_sol_includes: ['旅游交通', '官方导游', '门票', '基本住宿'],
+                    pkg_otuzco_name: '奥图斯科', pkg_otuzco_desc: '奥图斯科被称为“信仰之都”，以其宏伟的圣殿和安第斯山脉的景观等待着您。一次奉献与文化的体验。', pkg_otuzco_duration: '全天', pkg_otuzco_includes: ['交通', '导游', '车上小吃'],
+                    pkg_sipan_name: '西潘一日游', pkg_sipan_desc: '在全日游中发现西潘王的宝藏。参观皇家陵墓博物馆和瓦卡拉哈达考古遗址。', pkg_sipan_duration: '全天', pkg_sipan_includes: ['从奇克拉约出发的交通', '专家导游', '博物馆门票'],
+                    pkg_cascas_extreme_name: '卡斯卡斯 - 极限一日游', pkg_cascas_extreme_desc: '在葡萄和葡萄酒之都体验冒险和刺激。享受高空滑索、吊桥和美味的当地美食。', pkg_cascas_extreme_duration: '全天', pkg_cascas_extreme_includes: ['交通', '冒险运动', '品酒'],
+                    pkg_cascas_especial_name: '卡斯卡斯 - 特别日', pkg_cascas_especial_desc: '卡斯卡斯之旅的扩展版，有更多时间享受酒庄、游泳池和山谷的美景。', pkg_cascas_especial_duration: '全天', pkg_cascas_especial_includes: ['交通', '导游', '当地午餐', '参观葡萄园'],
+                    pkg_canoncillo_name: '卡尼翁西略 - 全天', pkg_canoncillo_desc: '探索沙漠中的绿洲——卡尼翁西略干旱森林。非常适合远足、滑沙和与大自然亲密接触。', pkg_canoncillo_duration: '全天', pkg_canoncillo_includes: ['四驱车交通', '导游', '滑沙板'],
+                    pkg_cordonada_name: '科尔多纳达 - 全天', pkg_cordonada_desc: '发现令人印象深刻的科尔多纳达瀑布，这是拉利伯塔德高地隐藏的宝石。一次值得努力的徒步旅行。', pkg_cordonada_duration: '全天', pkg_cordonada_includes: ['交通', '徒步导游', '盒装午餐'],
+                    pkg_tokyo_name: '东京大冒险', pkg_tokyo_desc: '沉浸在东京充满活力的文化中。从古老的寺庙到霓虹灯摩天大楼，这座城市的每个角落都会给您带来惊喜。', pkg_tokyo_duration: '7天/6夜', pkg_tokyo_includes: ['国际航班', '四星级住宿', '部分导游服务', '日本铁路通票']
+                }
+            };
+            const exchangeRates = { USD: 1, PEN: 3.74, EUR: 0.92, JPY: 155.5, CNY: 7.25 };
+            
+            const packages = [
+                { id: 1, priceUSD: 175, image: 'https://i.postimg.cc/ydgYh3Wv/Ruta-del-Sol-info.png', nameKey: 'pkg_ruta_del_sol_name', descriptionKey: 'pkg_ruta_del_sol_desc', durationKey: 'pkg_ruta_del_sol_duration', includesKey: 'pkg_ruta_del_sol_includes' },
+                { id: 2, priceUSD: 38, image: 'https://i.postimg.cc/cC02xVqV/Otuzco-info.png', nameKey: 'pkg_otuzco_name', descriptionKey: 'pkg_otuzco_desc', durationKey: 'pkg_otuzco_duration', includesKey: 'pkg_otuzco_includes' },
+                { id: 3, priceUSD: 51, image: 'https://i.postimg.cc/nzdQ30jG/Ruta-del-Sol-info.png', nameKey: 'pkg_sipan_name', descriptionKey: 'pkg_sipan_desc', durationKey: 'pkg_sipan_duration', includesKey: 'pkg_sipan_includes' },
+                { id: 4, priceUSD: 32, image: 'https://i.postimg.cc/ZY8ZsDMs/12.png', nameKey: 'pkg_cascas_extreme_name', descriptionKey: 'pkg_cascas_extreme_desc', durationKey: 'pkg_cascas_extreme_duration', includesKey: 'pkg_cascas_extreme_includes' },
+                { id: 5, priceUSD: 34, image: 'https://i.postimg.cc/8PTG2B22/15.png', nameKey: 'pkg_cascas_especial_name', descriptionKey: 'pkg_cascas_especial_desc', durationKey: 'pkg_cascas_especial_duration', includesKey: 'pkg_cascas_especial_includes' },
+                { id: 6, priceUSD: 22, image: 'https://i.postimg.cc/TYQxf5Gh/21.png', nameKey: 'pkg_canoncillo_name', descriptionKey: 'pkg_canoncillo_desc', durationKey: 'pkg_canoncillo_duration', includesKey: 'pkg_canoncillo_includes' },
+                { id: 7, priceUSD: 22, image: 'https://i.postimg.cc/Y9KRLVJ3/IMG-20260427-WA0079(1).jpg', nameKey: 'pkg_cordonada_name', descriptionKey: 'pkg_cordonada_desc', durationKey: 'pkg_cordonada_duration', includesKey: 'pkg_cordonada_includes' },
+                { id: 8, priceUSD: 1800, image: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=2070&auto=format&fit=crop', nameKey: 'pkg_tokyo_name', descriptionKey: 'pkg_tokyo_desc', durationKey: 'pkg_tokyo_duration', includesKey: 'pkg_tokyo_includes' }
+            ];
+
+            // --- SELECTORES DEL DOM ---
+            const langSwitcherBtn = document.getElementById('lang-switcher-btn');
+            const langSwitcherDropdown = document.getElementById('lang-switcher-dropdown');
+            const searchInput = document.getElementById('search-input');
+            const packagesContainer = document.getElementById('packages-container');
+            const cartBtn = document.getElementById('cart-btn');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const cartModal = document.getElementById('cart-modal');
+            const modalBackdrop = document.getElementById('modal-backdrop');
+            const modalContent = document.getElementById('modal-content');
+            const cartItemsContainer = document.getElementById('cart-items-container');
+            const emptyCartMsg = document.getElementById('empty-cart-msg');
+            const cartTotalEl = document.getElementById('cart-total');
+            const cartCounter = document.getElementById('cart-counter');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            const detailModal = document.getElementById('package-detail-modal');
+            const detailModalBackdrop = document.getElementById('detail-modal-backdrop');
+            const detailModalContent = document.getElementById('detail-modal-content');
+            const closeDetailModalBtn = document.getElementById('close-detail-modal-btn');
+            const detailImg = document.getElementById('detail-img');
+            const detailName = document.getElementById('detail-name');
+            const detailDesc = document.getElementById('detail-desc');
+            const detailDuration = document.getElementById('detail-duration');
+            const detailIncludes = document.getElementById('detail-includes');
+            const detailPrice = document.getElementById('detail-price');
+            const detailAddToCartBtn = document.getElementById('detail-add-to-cart-btn');
+
+            // --- FUNCIONES ---
+
+            function setLanguage(lang, currency) {
+                currentLang = lang;
+                currentCurrency = currency;
+                
+                document.querySelectorAll('[data-translate]').forEach(el => {
+                    const key = el.getAttribute('data-translate');
+                    if (translations[lang] && translations[lang][key]) {
+                        el.textContent = translations[lang][key];
+                    }
+                });
+
+                document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-translate-placeholder');
+                    if (translations[lang] && translations[lang][key]) {
+                        el.placeholder = translations[lang][key];
+                    }
+                });
+                
+                document.getElementById('current-lang-display').textContent = `${lang.toUpperCase()} | ${currency}`;
+                renderPackages();
+                renderCart();
+            }
+
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat(currentLang, {
+                    style: 'currency',
+                    currency: currentCurrency,
+                    minimumFractionDigits: 2,
+                }).format(amount);
+            }
+
+            function renderPackages(searchTerm = '') {
+                let packagesHTML = '';
+                const fromText = translations[currentLang].price_from;
+
+                const filteredPackages = packages.filter(pkg => {
+                    const translatedName = translations[currentLang][pkg.nameKey] || '';
+                    return translatedName.toLowerCase().includes(searchTerm.toLowerCase());
+                });
+                
+                if (filteredPackages.length === 0) {
+                    packagesContainer.innerHTML = `<p class="text-center text-gray-500 col-span-full">${translations[currentLang].no_results}</p>`;
+                    return;
+                }
+
+                filteredPackages.forEach(pkg => {
+                    const convertedPrice = pkg.priceUSD * exchangeRates[currentCurrency];
+                    const isAdded = cart.some(item => item.id === pkg.id);
+                    const translatedName = translations[currentLang][pkg.nameKey];
+                    
+                    packagesHTML += `
+                        <div class="package-card bg-white rounded-xl shadow-lg overflow-hidden flex flex-col" data-package-id="${pkg.id}">
+                            <img src="${pkg.image}" alt="${translatedName}" class="w-full h-48 object-cover pointer-events-none">
+                            <div class="p-5 flex flex-col flex-grow pointer-events-none">
+                                <h3 class="text-xl font-bold mb-2">${translatedName}</h3>
+                                <div class="mt-auto">
+                                    <p class="text-gray-500 text-sm mb-1">${fromText}</p>
+                                    <p class="text-2xl font-extrabold text-gray-800 mb-4">${formatCurrency(convertedPrice)}</p>
+                                    <button 
+                                        class="add-to-cart-btn w-full font-bold py-2 px-4 rounded-lg transition-colors duration-300 pointer-events-auto ${isAdded ? 'bg-green-500 text-white cursor-not-allowed' : 'bg-rose-500 text-white hover:bg-rose-600'}" 
+                                        data-id="${pkg.id}" ${isAdded ? 'disabled' : ''}>
+                                        <div class="flex items-center justify-center space-x-2">
+                                            <i data-lucide="${isAdded ? 'check' : 'shopping-cart'}" class="w-5 h-5"></i>
+                                            <span>${isAdded ? translations[currentLang].added_to_cart : translations[currentLang].add_to_cart}</span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                });
+                
+                packagesContainer.innerHTML = packagesHTML;
+
+                lucide.createIcons();
+            }
+            
+            function addToCart(packageId) {
+                const existingItem = cart.find(item => item.id === packageId);
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    const packageToAdd = packages.find(p => p.id === packageId);
+                    if (packageToAdd) {
+                        cart.push({ ...packageToAdd, quantity: 1 });
+                    }
+                }
+                updateCart();
+            }
+            
+            function increaseQuantity(packageId) {
+                const item = cart.find(i => i.id === packageId);
+                if (item) {
+                    item.quantity++;
+                    updateCart();
+                }
+            }
+
+            function decreaseQuantity(packageId) {
+                const item = cart.find(i => i.id === packageId);
+                if (item && item.quantity > 1) {
+                    item.quantity--;
+                    updateCart();
+                } else {
+                    removeFromCart(packageId);
+                }
+            }
+
+            function removeFromCart(packageId) {
+                const index = cart.findIndex(item => item.id === packageId);
+                if (index > -1) {
+                    cart.splice(index, 1);
+                    updateCart();
+                }
+            }
+
+            function updateCart() {
+                renderCart();
+                updateCartCounter();
+                const currentSearchTerm = searchInput.value;
+                renderPackages(currentSearchTerm);
+                if (!detailModal.classList.contains('hidden')) {
+                    const openPackageId = parseInt(detailAddToCartBtn.dataset.id);
+                    if (openPackageId) {
+                        updateDetailModalButton(openPackageId);
+                    }
+                }
+            }
+            
+            function renderCart() {
+                if (cart.length === 0) {
+                    emptyCartMsg.style.display = 'block';
+                    cartItemsContainer.innerHTML = '';
+                    cartItemsContainer.appendChild(emptyCartMsg);
+                    checkoutBtn.disabled = true;
+
+                } else {
+                    emptyCartMsg.style.display = 'none';
+                    cartItemsContainer.innerHTML = '';
+                    cart.forEach(item => {
+                        const convertedPrice = item.priceUSD * exchangeRates[currentCurrency];
+                        const translatedName = translations[currentLang][item.nameKey];
+                        const itemEl = document.createElement('div');
+                        itemEl.className = 'flex items-center justify-between py-4 border-b';
+                        itemEl.innerHTML = `
+                            <div class="flex items-center space-x-4">
+                                <img src="${item.image}" alt="${translatedName}" class="w-16 h-16 object-cover rounded-md">
+                                <div>
+                                    <p class="font-semibold">${translatedName}</p>
+                                    <p class="text-gray-600 font-bold">${formatCurrency(convertedPrice * item.quantity)}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <button class="decrease-quantity-btn bg-gray-200 rounded-full w-7 h-7 flex items-center justify-center font-bold text-lg hover:bg-gray-300" data-id="${item.id}">-</button>
+                                <span class="font-bold w-5 text-center">${item.quantity}</span>
+                                <button class="increase-quantity-btn bg-gray-200 rounded-full w-7 h-7 flex items-center justify-center font-bold text-lg hover:bg-gray-300" data-id="${item.id}">+</button>
+                                <button class="remove-from-cart-btn text-red-500 hover:text-red-700 p-1 rounded-full ml-2" data-id="${item.id}">
+                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        `;
+                        cartItemsContainer.appendChild(itemEl);
+                    });
+                     checkoutBtn.disabled = false;
+                }
+                
+                const total = cart.reduce((sum, item) => sum + (item.priceUSD * item.quantity * exchangeRates[currentCurrency]), 0);
+                cartTotalEl.textContent = formatCurrency(total);
+                lucide.createIcons();
+            }
+
+            function updateCartCounter() {
+                 const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                if (totalItems > 0) {
+                    cartCounter.textContent = totalItems;
+                    cartCounter.classList.remove('hidden');
+                } else {
+                    cartCounter.classList.add('hidden');
+                }
+            }
+
+            function toggleCartModal(show) {
+                if (show) {
+                    cartModal.classList.remove('hidden');
+                    setTimeout(() => {
+                        modalBackdrop.classList.remove('opacity-0');
+                        modalContent.classList.remove('scale-95', 'opacity-0');
+                    }, 10);
+                } else {
+                    modalBackdrop.classList.add('opacity-0');
+                    modalContent.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => {
+                        cartModal.classList.add('hidden');
+                    }, 300); 
+                }
+            }
+            
+            function renderPackageDetail(packageId) {
+                const pkg = packages.find(p => p.id === packageId);
+                if (!pkg) return;
+
+                detailImg.src = pkg.image;
+                detailName.textContent = translations[currentLang][pkg.nameKey];
+                detailDesc.textContent = translations[currentLang][pkg.descriptionKey];
+                detailDuration.textContent = translations[currentLang][pkg.durationKey];
+                
+                detailIncludes.innerHTML = '';
+                const includesList = translations[currentLang][pkg.includesKey] || [];
+                includesList.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    detailIncludes.appendChild(li);
+                });
+
+                const convertedPrice = pkg.priceUSD * exchangeRates[currentCurrency];
+                detailPrice.textContent = formatCurrency(convertedPrice);
+
+                detailAddToCartBtn.dataset.id = pkg.id;
+                updateDetailModalButton(packageId);
+
+                lucide.createIcons(); 
+            }
+
+            function updateDetailModalButton(packageId) {
+                const isAdded = cart.some(item => item.id === packageId);
+                detailAddToCartBtn.disabled = isAdded;
+                detailAddToCartBtn.className = `add-to-cart-btn w-full font-bold py-3 px-4 rounded-lg transition-colors duration-300 ${isAdded ? 'bg-green-500 text-white cursor-not-allowed' : 'bg-rose-500 text-white hover:bg-rose-600'}`;
+                detailAddToCartBtn.innerHTML = `
+                    <div class="flex items-center justify-center space-x-2">
+                        <i data-lucide="${isAdded ? 'check' : 'shopping-cart'}" class="w-5 h-5"></i>
+                        <span>${isAdded ? translations[currentLang].added_to_cart : translations[currentLang].add_to_cart}</span>
+                    </div>
+                `;
+                lucide.createIcons();
+            }
+            
+            function toggleDetailModal(show) {
+                 if (show) {
+                    detailModal.classList.remove('hidden');
+                    setTimeout(() => {
+                        detailModalBackdrop.classList.remove('opacity-0');
+                        detailModalContent.classList.remove('scale-95', 'opacity-0');
+                    }, 10);
+                } else {
+                    detailModalBackdrop.classList.add('opacity-0');
+                    detailModalContent.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => {
+                        detailModal.classList.add('hidden');
+                    }, 300); 
+                }
+            }
+
+            // --- MANEJADORES DE EVENTOS ---
+            
+            langSwitcherBtn.addEventListener('click', () => {
+                langSwitcherDropdown.classList.toggle('hidden');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!langSwitcherBtn.contains(e.target) && !langSwitcherDropdown.contains(e.target)) {
+                    langSwitcherDropdown.classList.add('hidden');
+                }
+            });
+            
+            document.querySelectorAll('.lang-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const lang = e.currentTarget.dataset.lang;
+                    const currency = e.currentTarget.dataset.currency;
+                    setLanguage(lang, currency);
+                    langSwitcherDropdown.classList.add('hidden');
+                });
+            });
+
+            searchInput.addEventListener('input', (e) => {
+                renderPackages(e.target.value);
+            });
+            
+            document.body.addEventListener('click', e => {
+                const packageCard = e.target.closest('.package-card');
+                if (packageCard && !e.target.closest('.add-to-cart-btn')) {
+                    const packageId = parseInt(packageCard.dataset.packageId);
+                    renderPackageDetail(packageId);
+                    toggleDetailModal(true);
+                }
+                
+                const buttonWithId = e.target.closest('[data-id]');
+                if (!buttonWithId) return;
+                const packageId = parseInt(buttonWithId.dataset.id);
+
+                if (buttonWithId.matches('.add-to-cart-btn')) {
+                    addToCart(packageId);
+                }
+                if (e.target.closest('.remove-from-cart-btn')) {
+                    removeFromCart(packageId);
+                }
+                if (e.target.closest('.increase-quantity-btn')) {
+                    increaseQuantity(packageId);
+                }
+                if (e.target.closest('.decrease-quantity-btn')) {
+                    decreaseQuantity(packageId);
+                }
+            });
+
+            cartBtn.addEventListener('click', () => toggleCartModal(true));
+            closeModalBtn.addEventListener('click', () => toggleCartModal(false));
+            modalBackdrop.addEventListener('click', () => toggleCartModal(false));
+
+            closeDetailModalBtn.addEventListener('click', () => toggleDetailModal(false));
+            detailModalBackdrop.addEventListener('click', () => toggleDetailModal(false));
+
+            checkoutBtn.addEventListener('click', () => {
+                const whatsappNumber = "51983290098";
+                
+                let message = "¡Hola! Quiero finalizar mi compra en VGIO TOURS.\n\n";
+                message += "Detalles de mi carrito:\n";
+                
+                cart.forEach(item => {
+                    const convertedPrice = item.priceUSD * exchangeRates[currentCurrency];
+                    const translatedName = translations[currentLang][item.nameKey];
+                    message += `- ${translatedName} (x${item.quantity}): ${formatCurrency(convertedPrice * item.quantity)}\n`;
+                });
+                
+                const total = cart.reduce((sum, item) => sum + (item.priceUSD * item.quantity * exchangeRates[currentCurrency]), 0);
+                message += `\nTotal: ${formatCurrency(total)}\n`;
+                
+                const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+                window.open(url, "_blank");
+            });
+
+            // --- INICIALIZACIÓN ---
+            lucide.createIcons();
+            setLanguage('es', 'PEN');
+        });
+    </script>
+</body>
+</html>
